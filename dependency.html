@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Be My Valentine 💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Background image */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+  }
+
+  .bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+
+  /* Pink overlay */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,182,193,0.45);
+    z-index: -2;
+  }
+
+  /* Floating hearts background */
+  .hearts {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .heart-bg {
+    position: absolute;
+    bottom: -40px;
+    animation: floatHeart linear infinite;
+    opacity: 0.7;
+  }
+
+  @keyframes floatHeart {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-110vh) scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  /* Card */
+  .card {
+    width: 380px;
+    padding: 42px 32px;
+    border-radius: 30px;
+    text-align: center;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 30px 60px rgba(255,77,109,0.35);
+    animation: floatCard 4s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  @keyframes floatCard {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  h2, h3 {
+    font-family: 'Playfair Display', serif;
+    color: #ff3366;
+  }
+
+  p {
+    color: #555;
+    font-size: 15px;
+    min-height: 52px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    text-align: center;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 14px;
+    font-size: 16px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .primary {
+    background: linear-gradient(135deg, #ff4d6d, #ff85a1);
+    color: white;
+    font-weight: 600;
+  }
+
+  .primary:hover {
+    transform: scale(1.07);
+  }
+
+  .secondary {
+    background: #ffe6ec;
+    color: #ff3366;
+  }
+
+  .option {
+    background: #ffe6ec;
+    color: #ff3366;
+    margin-top: 10px;
+  }
+
+  .option:hover {
+    background: #ffccd5;
+    transform: scale(1.05);
+  }
+
+  .hidden { display: none; }
+
+  /* Click hearts */
+  .heart {
+    position: fixed;
+    font-size: 20px;
+    animation: floatUp 2s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-120px) scale(1.6); }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Background -->
+<div class="bg"><img src="bg.jpg"></div>
+<div class="overlay"></div>
+
+<!-- Floating hearts background -->
+<div class="hearts" id="hearts"></div>
+
+<!-- SCREEN 1 -->
+<div class="card" id="proposal">
+  <h2>💘 Will you be my Valentine? 💘</h2>
+  <p id="noMessage">Take your time… but choose wisely 😌</p>
+
+  <button class="primary" id="yesBtn">Yes 😍</button>
+  <button class="secondary" id="noBtn">No 🙃</button>
+</div>
+
+<!-- SCREEN 2 -->
+<div class="card hidden" id="warning">
+  <h2>😌 It won’t be easy…</h2>
+  <p>
+    Being my Valentine comes with responsibilities 💕  
+    <br><br>
+    First, answer this quiz 😏
+  </p>
+  <button class="primary" id="startQuizBtn">Start Quiz 💖</button>
+</div>
+
+<!-- SCREEN 3 -->
+<div class="card hidden" id="quiz">
+  <h3 id="question"></h3>
+  <div id="options"></div>
+</div>
+
+<!-- SCREEN 4 -->
+<div class="card hidden" id="final">
+  <h2>🎉 Okayyy… you actually did it! 🎉</h2>
+  <p>You passed every test (impressive 😌💞)</p>
+  <h3>Quiz aside… you were always my forever Valentine 🥺💖💍</h3>
+</div>
+
+<script>
+  /* Background hearts generator */
+  const heartsContainer = document.getElementById("hearts");
+
+  function createBackgroundHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart-bg";
+    heart.innerText = "💗";
+
+    const size = Math.random() * 18 + 12;
+    heart.style.fontSize = size + "px";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = Math.random() * 6 + 6 + "s";
+
+    heartsContainer.appendChild(heart);
+    setTimeout(() => heart.remove(), 12000);
+  }
+
+  setInterval(createBackgroundHeart, 350);
+
+  /* Existing logic */
+  const noBtn = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+  const startQuizBtn = document.getElementById("startQuizBtn");
+
+  const proposal = document.getElementById("proposal");
+  const warning = document.getElementById("warning");
+  const quiz = document.getElementById("quiz");
+  const final = document.getElementById("final");
+
+  const noMessage = document.getElementById("noMessage");
+  const questionEl = document.getElementById("question");
+  const optionsEl = document.getElementById("options");
+
+  const cuteNoMessages = [
+    "Did you send soooo many reels just to say nooo? 🥺💔👉👈",
+    "Ummmm… compensating for saying yes to me the first time during confession? 😌💞",
+    "Huhhh… just checking how many cute messages I’ve added for No, huh? 😏✨",
+    "Better say yes now or you will get some big-girl treatment from me 😌😉💖🔥",
+    "Aww… looks like I’m out of messages now 🥺💞"
+  ];
+
+  let noClicks = 0;
+
+  function typeText(element, text) {
+    element.textContent = "";
+    let i = 0;
+    const interval = setInterval(() => {
+      element.textContent += text.charAt(i);
+      i++;
+      if (i >= text.length) clearInterval(interval);
+    }, 35);
+  }
+
+  function spawnHearts(count) {
+    for (let i = 0; i < count; i++) {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.innerText = "💖";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.bottom = "20px";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 2000);
+    }
+  }
+
+  noBtn.onclick = () => {
+    typeText(noMessage, cuteNoMessages[noClicks % cuteNoMessages.length]);
+    spawnHearts(noClicks + 1);
+    noClicks++;
+  };
+
+  yesBtn.onclick = () => {
+    proposal.classList.add("hidden");
+    warning.classList.remove("hidden");
+  };
+
+  startQuizBtn.onclick = () => {
+    warning.classList.add("hidden");
+    quiz.classList.remove("hidden");
+    loadQuestion();
+  };
+
+  const quizData = [
+  {
+    question: "❤️ What’s my favourite thing to do with you? 😌",
+    options: [
+      "Take you shopping 🛍️",
+      "Watch a movie together 🎬🍿",
+      "Take you out on a cute date 💕",
+      "The obvious 😉🔥"
+    ],
+    correct: 2
+  },
+  {
+    question: "❤️ What do I like about you the most? 🥰",
+    options: [
+      "Your smile 😊",
+      "Your simplicity ✨",
+      "We both know 😉💖",
+      "Your father's land 😜"
+    ],
+    correct: 1
+  },
+  {
+    question: "😏 What do I miss about you the most?",
+    options: [
+      "Hanging out with you 💞",
+      "Walking with you 🚶‍♂️💫",
+      "IYKYK 😉🔥",
+      "All of the above 😌💖"
+    ],
+    correct: 3
+  }
+];
+
+
+  let currentQuestion = 0;
+
+  function loadQuestion() {
+    questionEl.innerText = quizData[currentQuestion].question;
+    optionsEl.innerHTML = "";
+
+    quizData[currentQuestion].options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "option";
+      btn.innerText = opt;
+      btn.onclick = () => checkAnswer(i);
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selected) {
+    if (selected === quizData[currentQuestion].correct) {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        quiz.classList.add("hidden");
+        final.classList.remove("hidden");
+      }
+    } else {
+      alert("You naughty girl 😜 Try again!");
+    }
+  }
+</script>
+
+</body>
+</html>
